@@ -21110,8 +21110,8 @@
   ***************************************************************************/
  /***************************************************************************
   *  $Log: sidplay-libs_2.1.1-7.diff,v $
-  *  Revision 1.1  2008/11/11 00:25:39  snirkel
-  *  Updates to make this compile on a modern system.
+  *  Revision 1.2  2008/11/11 00:41:47  snirkel
+  *  Try to fix patch problem.
   *
 + *  Revision 1.6  2005/11/20 11:02:06  s_a_white
 + *  Work around for bug in gcc 4 (optimiser breaks if variable never has a

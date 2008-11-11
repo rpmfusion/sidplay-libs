@@ -4,13 +4,13 @@
 
 Name:           sidplay-libs
 Version:        2.1.1
-Release:        7%{?dist}
+Release:        8%{?dist}
 Summary:        A software library for playing back C64 SID files
 URL:            http://sidplay2.sourceforge.net/
 Group:          System Environment/Libraries
 Source0:        http://download.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
 # This patch is just lifted from Debian, here:
-# http://packages.debian.org/etch/libsidplay2
+# http://packages.debian.org/unstable/oldlibs/libsidplay2
 Patch0:         sidplay-libs_2.1.1-7.diff
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 License:        GPLv2+
@@ -133,6 +133,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/sidplay/builders/*.la
 
 %changelog
+* Tue Nov 11 2008 Linus Walleij <triad@df.lth.se> 2.1.1-8
+- Random build bug.
+
 * Tue Nov 11 2008 Linus Walleij <triad@df.lth.se> 2.1.1-7
 - Update patch from Debian so we compile again.
 - Import to RPMFusion and try to build it there.
