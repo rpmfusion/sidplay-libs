@@ -11,7 +11,7 @@ Group:          System Environment/Libraries
 Source0:        http://download.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
 # This patch is just lifted from Debian, here:
 # http://packages.debian.org/unstable/oldlibs/libsidplay2
-Patch0:         sidplay-libs_2.1.1-7.diff
+Patch0:         sidplay-libs_2.1.1-7.diff.gz
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 License:        GPLv2+
 BuildRequires:  automake
@@ -134,7 +134,8 @@ rm -rf $RPM_BUILD_ROOT
 
 %changelog
 * Tue Nov 11 2008 Linus Walleij <triad@df.lth.se> 2.1.1-8
-- Random build bug.
+- CVS checkin mangles the patch so I have to add it as
+  a .gz file instead!
 
 * Tue Nov 11 2008 Linus Walleij <triad@df.lth.se> 2.1.1-7
 - Update patch from Debian so we compile again.
