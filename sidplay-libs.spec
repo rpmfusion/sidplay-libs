@@ -4,7 +4,7 @@
 
 Name:           sidplay-libs
 Version:        2.1.1
-Release:        9%{?dist}
+Release:        10%{?dist}
 Summary:        A software library for playing back C64 SID files
 URL:            http://sidplay2.sourceforge.net/
 Group:          System Environment/Libraries
@@ -68,6 +68,8 @@ done
 chmod -x libsidutils/include/sidplay/utils/SidUsage.h
 
 %build
+# Create position-independent code plz
+export CXXFLAGS="$RPM_OPT_FLAGS -fPIC"
 # Cannot use --disable-static here, the builder need static
 # libraries to work at all.
 %configure
@@ -133,6 +135,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/sidplay/builders/*.la
 
 %changelog
+* Wed Aug 26 2009 Linus Walleij <triad@df.lth.se> 2.1.1-10
+- Make the library position independent with -fPIC at the
+  request of Orcan Ogetbil for XMMS2
+
 * Sun Mar 29 2009 Thorsten Leemhuis <fedora [AT] leemhuis [DOT] info> - 2.1.1-9
 - rebuild for new F11 features
 
