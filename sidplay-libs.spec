@@ -4,15 +4,16 @@
 
 Name:           sidplay-libs
 Version:        2.1.1
-Release:        10%{?dist}
+Release:        11%{?dist}
 Summary:        A software library for playing back C64 SID files
 URL:            http://sidplay2.sourceforge.net/
 Group:          System Environment/Libraries
-Source0:        http://download.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
+Source0:        http://downloads.sourceforge.net/sidplay2/%{name}-%{version}.tar.gz
 # This patch is just lifted from Debian, here:
 # http://packages.debian.org/unstable/oldlibs/libsidplay2
 Patch0:         sidplay-libs_2.1.1-7.diff.gz
-BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
+# Build the builders as .so files please
+Patch1:         sidplay-libs-2.1.1-dynamic-builders.patch
 License:        GPLv2+
 BuildRequires:  automake
 BuildRequires:  autoconf
@@ -29,32 +30,19 @@ resid library is included with sidplay-libs.
 Summary:        Development files for sidplay-libs
 Group:          System Environment/Libraries
 Requires:       %{name} = %{version}-%{release}
-# We require libsidplay, since that version owns the subdirectory
-# "sidplay" in %{_includedir}.
-Requires:       libsidplay-devel
-Requires:	pkgconfig
+Obsoletes:      %{name}-static < %{version}-%{release}
 
 %description devel
 This package contains development files for the MOS Techology SID and
 6510 chip emulator layer sidplay-libs.
 
-%package static
-Summary:        Static libraries and libtool archives for sidplay-libs
-Group:          System Environment/Libraries
-Requires:       %{name} = %{version}-%{release}
-Requires:       %{name}-devel = %{version}-%{release}
-
-%description static
-This package contains some static libraries from sidplay-libs, which are
-needed at compile-time by e.g. sidplay2, since it makes use of the
-libtool archives.
-
 %prep
 %setup -q
 %patch0 -p1
+%patch1 -p1
 # Update to recent GNU autotools.
 mkdir -p resid/unix
-for i in libsidplay builders/{resid-builder,hardsid-builder} resid . ; do
+for i in libsidplay libsidutils builders/{resid-builder,hardsid-builder} resid . ; do
     pushd $i
     aclocal -I unix
     libtoolize --copy --force
@@ -68,73 +56,34 @@ done
 chmod -x libsidutils/include/sidplay/utils/SidUsage.h
 
 %build
-# Create position-independent code plz
-export CXXFLAGS="$RPM_OPT_FLAGS -fPIC"
-# Cannot use --disable-static here, the builder need static
-# libraries to work at all.
-%configure
+%configure --disable-static
 make %{?_smp_mflags}
 
 %install
-rm -rf $RPM_BUILD_ROOT
-
-# Hack to prevent relinking, from Mandriva package.
-# sed s/relink_command.*// < libsidutils/src/libsidutils.la > tmp.la
-# mv tmp.la libsidutils/src/libsidutils.la
 make install DESTDIR=$RPM_BUILD_ROOT
-
-# Move stuff around - making install from the build
-# tree for some reason put all files in all the wrong
-# places.
-mkdir $RPM_BUILD_ROOT%{_libdir}/sidplay
-mkdir $RPM_BUILD_ROOT%{_libdir}/sidplay/builders
-mv $RPM_BUILD_ROOT%{_libdir}/libhardsid-builder* \
-   $RPM_BUILD_ROOT%{_libdir}/sidplay/builders
-mv $RPM_BUILD_ROOT%{_libdir}/libresid-builder* \
-   $RPM_BUILD_ROOT%{_libdir}/sidplay/builders
-
-# Needed in Mandrake spec?
-# chrpath -d %buildroot%{_libdir}/libsidutils.so
-
-# This stuff cannot be removed as of now: it is referenced
-# internally and used by the library configuration.
-# Remove static libraries
-# rm -f $RPM_BUILD_ROOT%{_libdir}/*.a
-# Remove libtool archive remnants
-# rm -f $RPM_BUILD_ROOT%{_libdir}/*.la
-
-%clean
-rm -rf $RPM_BUILD_ROOT
+rm $RPM_BUILD_ROOT%{_libdir}/*.la
 
 %post -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
 
 %files
-%defattr(-, root, root)
+%defattr(-,root,root,-)
 %doc libsidplay/AUTHORS libsidplay/ChangeLog libsidplay/README libsidplay/TODO libsidplay/COPYING
 %{_libdir}/*.so.*
 
 %files devel
-%defattr(-, root, root)
-# The "libsidplay" package owns %{_includedir}/sidplay
-%dir %{_includedir}/sidplay/builders
-%dir %{_includedir}/sidplay/utils
-%dir %{_libdir}/sidplay
+%defattr(-,root,root,-)
 %{_libdir}/*.so
-%{_includedir}/sidplay/*.h
-%{_includedir}/sidplay/builders/*.h
-%{_includedir}/sidplay/utils/*.h
-# pkgconfig owns this dir
 %{_libdir}/pkgconfig/*.pc
-
-%files static
-%dir %{_libdir}/sidplay/builders
-%{_libdir}/*.a
-%{_libdir}/*.la
-%{_libdir}/sidplay/builders/*.a
-%{_libdir}/sidplay/builders/*.la
+%{_includedir}/sidplay
 
 %changelog
+* Thu Sep  8 2011 Hans de Goede <j.w.r.degoede@gmail.com> - 2.1.1-11
+- Build builders as shared objects rather then as static libs
+- Drop -static package
+- Stop requiring libsidplay-devel for /usr/include/sidplay dir ownership,
+  instead just co-own it
+
 * Wed Aug 26 2009 Linus Walleij <triad@df.lth.se> 2.1.1-10
 - Make the library position independent with -fPIC at the
   request of Orcan Ogetbil for XMMS2
