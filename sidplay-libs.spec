@@ -4,7 +4,7 @@
 
 Name:           sidplay-libs
 Version:        2.1.1
-Release:        12%{?dist}
+Release:        13%{?dist}
 Summary:        A software library for playing back C64 SID files
 URL:            http://sidplay2.sourceforge.net/
 Group:          System Environment/Libraries
@@ -78,6 +78,9 @@ rm $RPM_BUILD_ROOT%{_libdir}/*.la
 %{_includedir}/sidplay
 
 %changelog
+* Thu Mar 08 2012 Nicolas Chauvet <kwizart@gmail.com> - 2.1.1-13
+- Rebuilt for c++ ABI breakage
+
 * Thu Feb 09 2012 Nicolas Chauvet <kwizart@gmail.com> - 2.1.1-12
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_17_Mass_Rebuild
 
